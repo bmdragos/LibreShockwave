@@ -180,14 +180,11 @@ public class BitmapDecoder {
                 int byteIndex = rowOffset + x * 2;
 
                 if (byteIndex + 1 < data.length) {
-                    int pixel;
-                    if (bigEndian) {
-                        pixel = ((data[byteIndex] & 0xFF) << 8) | (data[byteIndex + 1] & 0xFF);
-                    } else {
-                        pixel = (data[byteIndex] & 0xFF) | ((data[byteIndex + 1] & 0xFF) << 8);
-                    }
+                    // Director 16-bit bitmaps always use big-endian pixel data
+                    // (Mac-originated format), regardless of file container endianness
+                    int pixel = ((data[byteIndex] & 0xFF) << 8) | (data[byteIndex + 1] & 0xFF);
 
-                    // Assume 1-5-5-5 format (common in Director)
+                    // 0-5-5-5 xRGB format (standard Director 16-bit)
                     int r = ((pixel >> 10) & 0x1F) * 255 / 31;
                     int g = ((pixel >> 5) & 0x1F) * 255 / 31;
                     int b = (pixel & 0x1F) * 255 / 31;

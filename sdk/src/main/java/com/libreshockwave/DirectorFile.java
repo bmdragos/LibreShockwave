@@ -257,7 +257,12 @@ public class DirectorFile {
             Palette palette = resolvePalette(info.paletteId());
 
             // Decode bitmap
+            // For 16-bit bitmaps authored on Mac, pixel data is big-endian
+            // regardless of the file container's endianness (XFIR vs RIFX)
             boolean bigEndian = endian == ByteOrder.BIG_ENDIAN;
+            if (info.bitDepth() == 16 && config != null && config.platform() == 2) {
+                bigEndian = true;  // Mac-authored bitmaps use big-endian pixel data
+            }
             int directorVersion = config != null ? config.directorVersion() : 500;
 
             Bitmap bitmap = BitmapDecoder.decode(
